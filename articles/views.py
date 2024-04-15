@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Article
 from .forms import ArticleForm
+from django.db.models import Q
 
 
 # Create your views here.
@@ -56,3 +57,16 @@ def update(request, article_pk):
         'form': form,
     }
     return render(request, 'articles/edit.html', context)
+
+def search(request):
+    query = request.GET.get('query')
+    articles = []
+    
+    if query:
+        articles = Article.objects.filter(
+            Q(title__contains=query) |
+            Q(content__contains=query) |
+            Q(created_at__contains=query)
+        )
+
+    return render(request, 'articles/search.html', {'articles': articles})
